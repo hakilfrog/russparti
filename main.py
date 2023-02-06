@@ -1,4 +1,4 @@
-class Suit:
+class Suit:  # AAAAAAAAAAA
     name: str
     symbol: str
 
