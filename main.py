@@ -45,7 +45,7 @@ class Suits:
 #     print(clubs.to_text())
 #     hearts = s.hearts()
 #     print(hearts.to_text())
-# 
+#
 # tests()
 
 class Card:
@@ -53,7 +53,7 @@ class Card:
     suit: Suit
 
     def to_text(self):
-        return self.name + self.symbol
+        return self.name + self.suit.symbol
 
 
 class Deck:
@@ -65,15 +65,24 @@ class Deck:
     def give_one_card(self):
         return self.cards.pop()
 
+    def to_text(self):
+        text = ''
+        for c in self.cards:
+            text += c.to_text() + ' '
+        return text
+
+    # def shuffle(self):
+    #     pass
+
 
 class DeckBuilder:
     cards: list[Card]
 
     def create_card_names_set(self):
-        list1 = [6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A']
+        list1 = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
         return list1
 
-    def suits_set(self):
+    def create_suits_set(self):
         suits = Suits()
         list2 = list()
         list2.append(suits.clubs())
@@ -84,10 +93,28 @@ class DeckBuilder:
 
     def create_deck(self):
         self.cards = list()
+
         # для каждой масти s
-        # для каждого имени карты n
-        # создать объект карты c
-        # c.nama = n
-        # c.suite = s
-        # добавить c в список self.cards
-        return self.cards
+        suits = self.create_suits_set()
+        names = self.create_card_names_set()
+        for su in suits:
+            # для каждого имени карты n
+            for na in names:
+                # создать объект карты c
+                c = Card()
+                c.name = na
+                c.suit = su
+                # print(na,su.symbol)
+                self.cards.append(c)
+
+        d = Deck()
+        d.cards = self.cards
+        return d
+
+
+db = DeckBuilder()
+deck = db.create_deck()
+print(deck.to_text())
+print(len(deck.to_text())/2)
+# deck.shuffle()
+# print(deck.to_text())
