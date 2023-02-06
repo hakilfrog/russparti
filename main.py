@@ -118,3 +118,4 @@ print(deck.to_text())
 print(len(deck.to_text())/2)
 # deck.shuffle()
 # print(deck.to_text())
+# abobus xd xd
