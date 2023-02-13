@@ -50,7 +50,11 @@ class Suits:
 #     print(clubs.to_text())
 #     hearts = s.hearts()
 #     print(hearts.to_text())
+#<<<<<<< HEAD
+#лохуу
+#=======
 #
+#>>>>>>> origin/main
 # tests()
 
 # класс Card, прописываем параметры, имя и масть, обращаясь к классу Suit
