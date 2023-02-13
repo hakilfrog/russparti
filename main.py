@@ -82,6 +82,8 @@ class Deck:
 class DeckBuilder:
     cards: list[Card]
 
+    def __init__(self):
+        self.cards = list()
     # функция с списком "имени" карт
     def create_card_names_set(self):
         list1 = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
