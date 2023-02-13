@@ -85,20 +85,17 @@ class Deck:
 
 
 # класс, который составляет колоду карт
+
 class DeckBuilder:
     cards: list[Card]
 
     def __init__(self):
         self.cards = list()
 
-    # функция с списком "имени" карт
-    def create_card_names_set_36(self):
-        list_36_values = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-        return list_36_values
+    def create_card_names_set(self):
+        raise NotImplementedError()
 
-    def create_card_names_set_54(self):
-        pass
-    # функция с списком мастей карт
+    # функция со списком мастей карт
     def create_suits_set(self):
         suits = Suits()
         # из объекта делаем лист
@@ -114,7 +111,7 @@ class DeckBuilder:
         self.cards = list()  # делаем лист
 
         suits = self.create_suits_set()
-        names = self.create_card_names_set_36()
+        names = self.create_card_names_set()
         # для каждой масти su
         for su in suits:
             # для каждого имени карты na
@@ -131,9 +128,32 @@ class DeckBuilder:
         return d
 
 
-db = DeckBuilder()
-deck = db.create_deck()
-print(deck.to_text())  # изначальная колода
+class SmallDeckBuilder(DeckBuilder):
 
-deck.shuffle()  # рандомим колоду
-print(deck.to_text())  # вывод рандомизированной колоды
+    # функция с списком "имени" карт
+    def create_card_names_set(self):
+        list_36_values = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        return list_36_values
+
+
+class FullDeckBuilder(DeckBuilder):
+
+    def create_card_names_set(self):
+        list_52_values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        return list_52_values
+
+
+db36 = SmallDeckBuilder()
+deck36 = db36.create_deck()
+# print(deck36.to_text())  # изначальная колода
+
+deck36.shuffle()  # рандомим колоду
+print(deck36.to_text())  # вывод рандомизированной колоды
+
+db52 = FullDeckBuilder()
+deck52 = db52.create_deck()
+deck52.shuffle()  # рандомим колоду
+print(deck52.to_text())  # изначальная колода
+c = deck52.give_one_card()
+print(c.to_text())  # вывод карты из колоды
+print(deck52.to_text())  # вывод рандомизи
