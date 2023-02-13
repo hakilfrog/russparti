@@ -1,3 +1,6 @@
+import random
+
+
 # создаём класс Suit (масть), к которому будем обращаться далее
 class Suit:
     name: str
@@ -66,6 +69,9 @@ class Deck:
     def __init__(self):  # я не знаю что такое инит, сорри)
         self.cards = list()  # э а о э
 
+    def shuffle(self):
+        random.shuffle(self.cards)
+
     # функция чтобы взять карту из колоды
     def give_one_card(self):
         return self.cards.pop()
@@ -84,6 +90,7 @@ class DeckBuilder:
 
     def __init__(self):
         self.cards = list()
+
     # функция с списком "имени" карт
     def create_card_names_set(self):
         list1 = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
@@ -124,12 +131,7 @@ class DeckBuilder:
 
 db = DeckBuilder()
 deck = db.create_deck()
-print(deck.to_text())
+print(deck.to_text())  # изначальная колода
 
-# на будущее:
-
-# deck.shuffle()
-# print(deck.to_text())
-
-# def shuffle(self):
-#     pass
+deck.shuffle()  # рандомим колоду
+print(deck.to_text())  # вывод рандомизированной колоды
