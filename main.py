@@ -92,27 +92,29 @@ class DeckBuilder:
         self.cards = list()
 
     # функция с списком "имени" карт
-    def create_card_names_set(self):
-        list1 = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-        return list1
+    def create_card_names_set_36(self):
+        list_36_values = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        return list_36_values
 
+    def create_card_names_set_54(self):
+        pass
     # функция с списком мастей карт
     def create_suits_set(self):
         suits = Suits()
         # из объекта делаем лист
-        list2 = list()
+        list_values_suits = list()
         # добавляем в лист все масти suits
-        list2.append(suits.clubs())
-        list2.append(suits.diamond())
-        list2.append(suits.spades())
-        list2.append(suits.hearts())
-        return list2
+        list_values_suits.append(suits.clubs())
+        list_values_suits.append(suits.diamond())
+        list_values_suits.append(suits.spades())
+        list_values_suits.append(suits.hearts())
+        return list_values_suits
 
     def create_deck(self):  # функция создания колоды
         self.cards = list()  # делаем лист
 
         suits = self.create_suits_set()
-        names = self.create_card_names_set()
+        names = self.create_card_names_set_36()
         # для каждой масти su
         for su in suits:
             # для каждого имени карты na
