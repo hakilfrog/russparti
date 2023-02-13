@@ -141,3 +141,4 @@ print(deck.to_text())  # изначальная колода
 
 deck.shuffle()  # рандомим колоду
 print(deck.to_text())  # вывод рандомизированной колоды
+print("hui")
