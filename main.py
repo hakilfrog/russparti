@@ -1,4 +1,4 @@
-# создаём класс Suit, к которому будем обращаться далее
+# создаём класс Suit (масть), к которому будем обращаться далее
 class Suit:
     name: str
     symbol: str
@@ -10,7 +10,7 @@ class Suit:
 # Создание объекта
 # Класс суитс, где мы обозначаем каждую масть
 class Suits:
-# создаём функцию на каждую масть, где прописываем нужные параметры, обращаясь к классу Suit
+    # создаём функцию на каждую масть, где прописываем нужные параметры, обращаясь к классу Suit
     def diamond(self):
         d = Suit()
         d.name = 'diamond'
@@ -19,9 +19,9 @@ class Suits:
 
     def spades(self):
         d = Suit()
-        d.name = 'spades' # имя масти
-        d.symbol = '♤' # значок
-        return d # возвращаем self.symbol
+        d.name = 'spades'  # имя масти
+        d.symbol = '♤'  # значок
+        return d  # возвращаем объект Suit (пики)
 
     def clubs(self):
         d = Suit()
@@ -36,7 +36,7 @@ class Suits:
         return d
 
 
- # пользовательский код чтобы чисто затестить вывод мастей (уже не нужен(вроде))
+# пользовательский код чтобы чисто затестить вывод мастей (уже не нужен(вроде))
 # def tests():
 #     s = Suits()
 #     diamond = s.diamond()
@@ -56,14 +56,15 @@ class Card:
     suit: Suit
 
     def to_text(self):
-        return self.name + self.suit.symbol # вывод имени и масти карты вместе
+        return self.name + self.suit.symbol  # вывод имени и масти карты вместе
 
 
 # класс Deck в котором прописываем колоду карт?
 class Deck:
-    cards: list[Card] # объект cards в котором список из объектов Card
-    def __init__(self):    # я не знаю что такое инит, сорри)
-        self.cards = list() # э а о э
+    cards: list[Card]  # объект cards в котором список из объектов Card
+
+    def __init__(self):  # я не знаю что такое инит, сорри)
+        self.cards = list()  # э а о э
 
     # функция чтобы взять карту из колоды
     def give_one_card(self):
@@ -76,7 +77,8 @@ class Deck:
             text += c.to_text() + ' '
         return text
 
-#класс, который составляет колоду карт
+
+# класс, который составляет колоду карт
 class DeckBuilder:
     cards: list[Card]
 
@@ -97,8 +99,8 @@ class DeckBuilder:
         list2.append(suits.hearts())
         return list2
 
-    def create_deck(self): #функция создания колоды
-        self.cards = list() #делаем лист
+    def create_deck(self):  # функция создания колоды
+        self.cards = list()  # делаем лист
 
         suits = self.create_suits_set()
         names = self.create_card_names_set()
@@ -110,8 +112,8 @@ class DeckBuilder:
                 c = Card()
                 c.name = na
                 c.suit = su
-               # print(na,su.symbol)  # по идее эта строчка нужна, но с ней работает не так лол
-                self.cards.append(c) #добавляем в список карту/ы
+                # print(na,su.symbol)  # по идее эта строчка нужна, но с ней работает не так лол
+                self.cards.append(c)  # добавляем в список карту/ы
 
         d = Deck()
         d.cards = self.cards
@@ -121,12 +123,11 @@ class DeckBuilder:
 db = DeckBuilder()
 deck = db.create_deck()
 print(deck.to_text())
-print(len(deck.to_text())/2)
 
-#на будущее:
+# на будущее:
 
 # deck.shuffle()
 # print(deck.to_text())
 
 # def shuffle(self):
-    #     pass
+#     pass
