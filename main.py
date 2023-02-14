@@ -99,6 +99,10 @@ class DeckBuilder:
     def create_card_names_set(self):
         raise NotImplementedError()
 
+    def create_card_names_set_36_letters(self):
+        list_36_letters = ['шестерка', 'семерка',"восьмерка", "девятка", "десятка", "валет", "дама", "король", "туз"]
+        return list_36_letters
+
     # функция со списком мастей карт
     def create_suits_set(self):
         suits = Suits()
@@ -110,30 +114,53 @@ class DeckBuilder:
         list_values_suits.append(suits.spades())
         list_values_suits.append(suits.hearts())
         return list_values_suits
+    def create_letters_suits_set(self):
+        list_letters_suits = ["крести", "буби", "пик", "черви"]
+        return list_letters_suits
 
     def create_deck(self):  # функция создания колоды
         self.cards = list()  # делаем лист
 
         suits = self.create_suits_set()
         names = self.create_card_names_set()
+        suits_letters = self.create_letters_suits_set()
+        names_letters = self.create_card_names_set_36_letters()
         # для каждой масти su
-        for su in suits:
-            # для каждого имени карты na
-            for na in names:
-                # создаем объект карты c
-                c = Card()
-                c.name = na
-                c.suit = su
-                # print(na,su.symbol)  # по идее эта строчка нужна, но с ней работает не так лол
-                self.cards.append(c)  # добавляем в список карту/ы
+        decide: int
+        decide = int(input("Какой вариант наименования карт вы хотите? 1- обычный 2-языковой"))
+        if decide == 1:
+            for su in suits:
+                # для каждого имени карты na
+                for na in names:
+                    # создаем объект карты c
+                    c = Card()
+                    c.name = na
+                    c.suit = su
+                    # print(na,su.symbol)  # по идее эта строчка нужна, но с ней работает не так лол
+                    self.cards.append(c)  # добавляем в список карту/ы
+        elif decide == 2:
+            for su in suits_letters:
+                # для каждого имени карты na
+                for na in names_letters:
+                    # создаем объект карты c
+                    c = Card()
+                    c.name = na
+                    c.suit = su
+                    # print(na,su.symbol)  # по идее эта строчка нужна, но с ней работает не так лол
+                    self.cards.append(c)  # добавляем в список карту/ы
 
         d = Deck()
         d.cards = self.cards
         return d
 
 
-class SmallDeckBuilder(DeckBuilder):
+#class SmallDeckBuilder(DeckBuilder):
 
+#<<<<<<< HEAD
+#deck.shuffle()  # рандомим колоду
+#print(deck.to_text())  # вывод рандомизированной колоды
+
+#=======
     # функция с списком "имени" карт
     def create_card_names_set(self):
         list_36_values = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
@@ -147,12 +174,12 @@ class FullDeckBuilder(DeckBuilder):
         return list_52_values
 
 
-db36 = SmallDeckBuilder()
-deck36 = db36.create_deck()
+#db36 = SmallDeckBuilder()
+#deck36 = db36.create_deck()
 # print(deck36.to_text())  # изначальная колода
 
-deck36.shuffle()  # рандомим колоду
-print(deck36.to_text())  # вывод рандомизированной колоды
+#deck36.shuffle()  # рандомим колоду
+#print(deck36.to_text())  # вывод рандомизированной колоды
 
 db52 = FullDeckBuilder()
 deck52 = db52.create_deck()
@@ -161,3 +188,4 @@ print(deck52.to_text())  # изначальная колода
 c = deck52.give_one_card()
 print(c.to_text())  # вывод карты из колоды
 print(deck52.to_text())  # вывод рандомизи
+
