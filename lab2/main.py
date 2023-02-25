@@ -3,14 +3,14 @@ class Item:  # look UML
     price: float = 0.0  # price of item
 
     def get_cost(self):  # get cost of item
-        return self.price
+        raise NotImplementedError
 
 
 class Coffee(Item):
     price = 6.0  # price of coffee
 
     def get_cost(self):
-        super().get_cost()
+        return self.price
 
 
 class NoneItem(Item):
