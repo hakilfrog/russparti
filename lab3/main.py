@@ -58,7 +58,17 @@ class Authentication:
 
     def proverka(self,db):
         for account in db.accounts():
-            if us_username == u.username
+            if self.us_username == account.username:
+                if self.us_password == account.password:
+                    print("все заебок")
+                else:
+                    print("Неправильный пароль")
+                    #TODO: again login (Anton)
+
+
+
+
+
 
 
 
