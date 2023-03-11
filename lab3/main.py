@@ -66,28 +66,58 @@ class CLIUserInput:
         self.resource = input("Введите ресурс к которому хотет доступ")
         return self.login, self.password, self.resource
 
+
 interface = CLIUserInput()
+
 
 class Authentication:
     account: Account
-    us_username = interface.login
-    us_password = interface.password
-    #def __init__(self, us_username, us_password):
-       ##us_password = us_password
+    us_username: str
+    us_password: str
+    def __init__(self, ):
+       self.us_username = interface.login
+       self.us_password = interface.password
 
-    def login_check(self, db, interface):
 
+    def login_check(self, db):
+        count = 0
         for account in db.accounts:
-            if interface.login == account.username:
-                print("А ты хорош")
-            else:
-                print("хуесос")
+            count += 1
+            if self.us_username == account.username:
+                somechel.password_check(db)
+                break
+            elif count == len(db.accounts):
+                print("Не правильный логин или пароль")
+
+    def password_check(self, db):
+        count = 0
+        for account in db.accounts:
+            count += 1
+            if self.us_password == account.password:
+                print("Аутефикация прошла успешно")
+                break
+            elif count == len(db.accounts):
+                print("Не правильный логин или пароль1")
+
+
+
+
+
+
+
+
+
 
 
 
            # try: interface.login
            # except AuthentificationError:
                # print('ERROR #1')
+
+    #         try:
+    #             self.login_check(db)
+    #         except AuthentificationError:
+    #              print('ERROR #1')
 
 
 
@@ -107,10 +137,13 @@ class Authentication:
 
 
 db.get_accounts()
-da=CLIUserInput()
-da.begin_user_interaction()
+for account in db.accounts:
+    print(account.username)
+    print(account.password)
+interface.begin_user_interaction()
 somechel = Authentication()
 somechel.login_check(db)
+
 
 
 
