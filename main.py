@@ -1,146 +1,191 @@
-# AAA
 import random
 
 
-class Group:
-    name = ''
-    rights = list()
+# создаём класс Suit (масть), к которому будем обращаться далее
+class Suit:
+    name: str
+    symbol: str
 
-    def __init__(self, name, rights):
-        self.name = name
-        self.rights = rights
-
-
-class Account:
-    username = ''
-    password = ''
-    groups: list[Group] = list()
-
-    def __init__(self, username, password, groups):
-        self.username = username
-        self.password = password
-        self.groups = groups
+    def to_text(self):
+        return self.symbol
 
 
-groupadmin = Group(name='groupadmin', rights=['p', 's'])
+# Создание объекта
+# Класс суитс, где мы обозначаем каждую масть
+class Suits:
+    # создаём функцию на каждую масть, где прописываем нужные параметры, обращаясь к классу Suit
+    def diamond(self):
+        d = Suit()
+        d.name = 'diamond'
+        d.symbol = '♢'
+        return d
+
+    def spades(self):
+        d = Suit()
+        d.name = 'spades'  # имя масти
+        d.symbol = '♤'  # значок
+        return d  # возвращаем объект Suit (пики)
+
+    def clubs(self):
+        d = Suit()
+        d.name = 'clubs'
+        d.symbol = '♧'
+        return d
+
+    def hearts(self):
+        d = Suit()
+        d.name = 'hearts'
+        d.symbol = '♡'
+        return d
 
 
-def gen_users():
-    users = list()
-    for user in range(20):
-        user = Account(username='u_' + str(random.randint(10, 99)), password='p_' + str(random.randint(100, 999)),
-                       groups=[groupadmin])
-        users.append(user)
-    return users
+# пользовательский код чтобы чисто затестить вывод мастей (уже не нужен(вроде))
+# def tests():
+#     s = Suits()
+#     diamond = s.diamond()
+#     print(diamond.to_text())
+#     spades = s.spades()
+#     print(spades.to_text())
+#     clubs = s.clubs()
+#     print(clubs.to_text())
+#     hearts = s.hearts()
+#     print(hearts.to_text())
+#<<<<<<< HEAD
+#лохуу
+#=======
+#
+#>>>>>>> origin/main
+# tests()
+
+# класс Card, прописываем параметры, имя и масть, обращаясь к классу Suit
+class Card:
+    name: str
+    suit: Suit
+
+    def to_text(self):
+        return self.name + self.suit.symbol  # вывод имени и масти карты вместе
 
 
-class Database:
-    accounts: list[Account] = list()
-    groups: list[Group] = list()
+# класс Deck в котором прописываем колоду карт?
+class Deck:
+    cards: list[Card]  # объект cards в котором список из объектов Card
+
+    def __init__(self):  # я не знаю что такое инит, сорри)
+        self.cards = list()  # э а о э
+
+    def shuffle(self):
+        random.shuffle(self.cards)
+
+    # функция чтобы взять карту из колоды
+    def give_one_card(self):
+        return self.cards.pop()
+
+    # я хз, но похоже что эта функция вывод нам карту + "пробел"
+    def to_text(self):
+        text = ''
+        for c in self.cards:
+            text += c.to_text() + ' '
+        return text
+
+
+# класс, который составляет колоду карт
+
+class DeckBuilder:
+    cards: list[Card]
 
     def __init__(self):
-        self.accounts = gen_users()
+        self.cards = list()
 
-    def get_accounts(self):
-        return self.accounts
+    def create_card_names_set(self):
+        raise NotImplementedError()
 
-    def add_account(self, account):
-        self.accounts.append(account)
+    def create_card_names_set_36_letters(self):
+        list_36_letters = ['шестерка', 'семерка',"восьмерка", "девятка", "десятка", "валет", "дама", "король", "туз"]
+        return list_36_letters
 
+    # функция со списком мастей карт
+    def create_suits_set(self):
+        suits = Suits()
+        # из объекта делаем лист
+        list_values_suits = list()
+        # добавляем в лист все масти suits
+        list_values_suits.append(suits.clubs())
+        list_values_suits.append(suits.diamond())
+        list_values_suits.append(suits.spades())
+        list_values_suits.append(suits.hearts())
+        return list_values_suits
+    def create_letters_suits_set(self):
+        list_letters_suits = ["крести", "буби", "пик", "черви"]
+        return list_letters_suits
 
+    def create_deck(self):  # функция создания колоды
+        self.cards = list()  # делаем лист
 
+        suits = self.create_suits_set()
+        names = self.create_card_names_set()
+        suits_letters = self.create_letters_suits_set()
+        names_letters = self.create_card_names_set_36_letters()
+        # для каждой масти su
+        decide: int
+        decide = int(input("Какой вариант наименования карт вы хотите? 1- обычный 2-языковой"))
+        if decide == 1:
+            for su in suits:
+                # для каждого имени карты na
+                for na in names:
+                    # создаем объект карты c
+                    c = Card()
+                    c.name = na
+                    c.suit = su
+                    # print(na,su.symbol)  # по идее эта строчка нужна, но с ней работает не так лол
+                    self.cards.append(c)  # добавляем в список карту/ы
+        elif decide == 2:
+            for su in suits_letters:
+                # для каждого имени карты na
+                for na in names_letters:
+                    # создаем объект карты c
+                    c = Card()
+                    c.name = na
+                    c.suit = su
+                    # print(na,su.symbol)  # по идее эта строчка нужна, но с ней работает не так лол
+                    self.cards.append(c)  # добавляем в список карту/ы
 
-
-class AuthentificationError(Exception):
-    pass
-
-
-class AuthorizationError(Exception):
-    pass
-
-
-class CLIUserInput:
-    login: str
-    password: str
-    resource: str
-
-    def begin_user_interaction(self):
-        self.login = input("Введите логин")
-        self.password = input("Введите пароль")
-        self.resource = input("Введите ресурс к которому хотите доступ")
-
-
-class CLIUserStub(CLIUserInput):
-    def begin_user_interaction(self):
-        self.login = 'l'
-        self.password = 'p'
-        self.resource = 'r'
-
-
-
-
-class Authentication:
-    account: Account
-    us_username: str
-    us_password: str
-
-    def __init__(self):
-        self.us_username = interface.login
-        self.us_password = interface.password
-
-    def login_check(self, db):
-        if self.us_username == account.username:
-            print(account.username)
-            a.password_check(db)
-        else:
-            print("Неправильный логин или пароль")
-
-    def password_check(self, db):
-
-        if self.us_password == account.password:
-            print("Аунтефикация прошла успешно")
-        else:
-            print("Неправильный логин или пароль")
+        d = Deck()
+        d.cards = self.cards
+        return d
 
 
+#class SmallDeckBuilder(DeckBuilder):
+
+#<<<<<<< HEAD
+#deck.shuffle()  # рандомим колоду
+#print(deck.to_text())  # вывод рандомизированной колоды
+
+#=======
+    # функция с списком "имени" карт
+    def create_card_names_set(self):
+        list_36_values = ['6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        return list_36_values
 
 
-        # try: interface.login
-        # except AuthentificationError: print('ERROR #1')
-        #
-        # try:
-        #      self.login_check(db)
-        #     except AuthentificationError:
-        #          print('ERROR #1')
+class FullDeckBuilder(DeckBuilder):
 
-    def proverka(self, db):
-        for account in db.accounts:
-            print(account.username)
-            # TODO: again login (Anton)
-
-###################################################################
-#interface = CLIUserStub()
-db = Database()
-interface = CLIUserInput()
-
-for account in db.get_accounts():
-    print(account.username, account.password)
+    def create_card_names_set(self):
+        list_52_values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        return list_52_values
 
 
-# interface.begin_user_interaction()
-interface.begin_user_interaction()
-a = Authentication()
-a.login_check(db)
+#db36 = SmallDeckBuilder()
+#deck36 = db36.create_deck()
+# print(deck36.to_text())  # изначальная колода
 
+#deck36.shuffle()  # рандомим колоду
+#print(deck36.to_text())  # вывод рандомизированной колоды
 
+db52 = FullDeckBuilder()
+deck52 = db52.create_deck()
+deck52.shuffle()  # рандомим колоду
+print(deck52.to_text())  # изначальная колода
+c = deck52.give_one_card()
+print(c.to_text())  # вывод карты из колоды
+print(deck52.to_text())  # вывод рандомизи
 
-# a
-
-
-# user1 = Account(username='user1', password='user', groups=[groupadmin])
-# db = Database()
-# db.get_accounts()
-# db.add_account(user1)
-# for u in db.accounts:
-#   print(u.username)
-#  print(u.password)
