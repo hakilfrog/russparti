@@ -93,14 +93,16 @@ class Authentication:
             print(account.username)
             a.password_check(db)
         else:
-            print("Не правильный логин или пароль")
+            print("Неправильный логин или пароль")
 
     def password_check(self, db):
 
         if self.us_password == account.password:
-            print("Аутефикация прошла успешно")
+            print("Аунтефикация прошла успешно")
         else:
-            print("Не правильный логин или пароль1")
+            print("Неправильный логин или пароль")
+
+    # я попытался добавить сюда метод resource_check, чтобы также проверять как логин и пароль, но что-то пошло не так
 
         # try: interface.login
         # except AuthentificationError:
@@ -119,14 +121,14 @@ class Authentication:
 ###################################################################
 #interface = CLIUserStub()
 db = Database()
-interfaceU = CLIUserInput()
+interface = CLIUserInput()
 
 for account in db.get_accounts():
     print(account.username, account.password)
 
 
 #interface.begin_user_interaction()
-interfaceU.begin_user_interaction()
+interface.begin_user_interaction()
 a = Authentication()
 a.login_check(db)
 
