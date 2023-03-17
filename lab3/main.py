@@ -1,4 +1,5 @@
 import random
+import datetime
 
 
 class Group:
@@ -85,6 +86,8 @@ class Authentication:
     def login_check(self, account):
         if self.us_username == account.username:
             self.password_check(account)
+            audit.add_incident(Incident(account, datetime.datetime.now(), status=True,
+                                        action="login"))  # создаётся объект инцидент в аудите. правильный ввод логина... наверое... пофигу!
         else:
             print("Неправильный логин или пароль")
 
@@ -95,13 +98,37 @@ class Authentication:
         else:
             print("Неправильный логин или пароль")
 
+
 class Authorization:
 
     def access_check(self):
-        if Anton == Chertila_ebannaya
+        pass  # if Anton == Chertila_ebannaya
 
 
+class Incident:
+    user_account: Account
+    time: datetime
+    status: bool
+    action: str
 
+    def __init__(self, user_name, time, status, action):
+        self.user_account = user_name
+        self.time = time
+        self.status = status
+        self.action = action
+
+
+class Audit:
+    incidents: list[Incident] = list()
+
+    def get_incidents(self):
+        for incident in self.incidents:
+            print(f'{incident.time} | user {incident.user_account.username} | ')
+
+    def add_incident(self, incident):
+        self.incidents.append(incident)
+
+    # я, нет блин я попытался добавить сюда метод resource_check, чтобы также проверять как логин и пароль, но что-то пошло не так
 
     # try: interface.login
     # except AuthentificationError:
@@ -112,9 +139,12 @@ class Authorization:
     #         except AuthentificationError:
     #              print('ERROR #1')
 
+    def proverka(self, db):
+        for account in db.accounts:
+            print(account.username)
 
 
-
+audit = Audit()
 ###################################################################
 # interface = CLIUserStub()
 groupadmin = Group(name='groupadmin', rights=['p', 's'])
@@ -123,14 +153,11 @@ interfaceU = CLIUserInput()
 interfaceM = CLIUserStub()
 
 testuser = Account('l', 'p', 'r')
-testuser1 = Account('l', 'p', 'r')
 db.add_account(testuser)
-db.add_account(testuser1)
 
 # interface.begin_user_interaction()
 # interfaceU.begin_user_interaction()
 # a = Authentication(interface=interfaceU)
-print(db.output())
 interfaceM.begin_user_interaction('l', 'p')
 a = Authentication(interfaceM)
 a.login_check(testuser)
@@ -142,3 +169,6 @@ a.login_check(testuser)
 # for u in db.accounts:
 #   print(u.username)
 #  print(u.password)
+
+
+audit.get_incidents()
