@@ -95,7 +95,7 @@ class Authentication:
     def password_check(self, account):
 
         if self.us_password == account.password:
-            print("Аунтефикация прошла успешно")
+            print("Аутенфикация прошла успешно")
         else:
             print("Неправильный логин или пароль")
 
