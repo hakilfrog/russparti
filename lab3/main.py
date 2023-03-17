@@ -88,7 +88,7 @@ class Authentication:
 
     def login_check(self, account):
         if self.us_username == account.username:
-            a.password_check(account)
+            self.password_check(account)
         else:
             print("Неправильный логин или пароль")
 
