@@ -71,10 +71,9 @@ class CLIUserInput:
 
 
 class CLIUserStub(CLIUserInput):
-    def begin_user_interaction(self, login = 'l', password = 'p'):
+    def begin_user_interaction(self, login='l', password='p'):
         self.login = login
         self.password = password
-
 
 
 class Authentication:
@@ -99,8 +98,6 @@ class Authentication:
         else:
             print("Неправильный логин или пароль")
 
-    # я попытался добавить сюда метод resource_check, чтобы также проверять как логин и пароль, но что-то пошло не так
-
     # try: interface.login
     # except AuthentificationError:
     # print('ERROR #1')
@@ -109,10 +106,6 @@ class Authentication:
     #             self.login_check(db)
     #         except AuthentificationError:
     #              print('ERROR #1')
-
-    def proverka(self, db):
-        for account in db.accounts:
-            print(account.username)
 
 
 
@@ -124,18 +117,17 @@ interfaceU = CLIUserInput()
 interfaceM = CLIUserStub()
 
 testuser = Account('l', 'p', 'r')
+testuser1 = Account('l', 'p', 'r')
 db.add_account(testuser)
-
-
+db.add_account(testuser1)
 
 # interface.begin_user_interaction()
-#interfaceU.begin_user_interaction()
-#a = Authentication(interface=interfaceU)
+# interfaceU.begin_user_interaction()
+# a = Authentication(interface=interfaceU)
+print(db.output())
 interfaceM.begin_user_interaction('l', 'p')
 a = Authentication(interfaceM)
 a.login_check(testuser)
-
-
 
 # user1 = Account(username='user1', password='user', groups=[groupadmin])
 # db = Database()
