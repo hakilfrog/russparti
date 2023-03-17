@@ -95,7 +95,7 @@ class Authentication:
     def password_check(self, account):
 
         if self.us_password == account.password:
-            print("Аутенфикация прошла успешно")
+            print("Аутентификация прошла успешно")
         else:
             print("Неправильный логин или пароль")
 
@@ -113,7 +113,7 @@ class Authentication:
     def proverka(self, db):
         for account in db.accounts:
             print(account.username)
-            # TODO: again login (Anton)
+
 
 
 
