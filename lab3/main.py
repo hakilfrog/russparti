@@ -21,9 +21,6 @@ class Account:
         self.groups = groups
 
 
-groupadmin = Group(name='groupadmin', rights=['p', 's'])
-
-
 def gen_users():
     users = list()
     for user in range(20):
@@ -98,6 +95,14 @@ class Authentication:
         else:
             print("Неправильный логин или пароль")
 
+class Authorization:
+
+    def access_check(self):
+        if Anton == Chertila_ebannaya
+
+
+
+
     # try: interface.login
     # except AuthentificationError:
     # print('ERROR #1')
@@ -112,6 +117,7 @@ class Authentication:
 
 ###################################################################
 # interface = CLIUserStub()
+groupadmin = Group(name='groupadmin', rights=['p', 's'])
 db = Database()
 interfaceU = CLIUserInput()
 interfaceM = CLIUserStub()
