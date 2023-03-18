@@ -26,7 +26,7 @@ def gen_users():
     users = list()
     for user in range(20):
         user = Account(username='u_' + str(random.randint(10, 99)), password='p_' + str(random.randint(100, 999)),
-                       groups=[groupadmin])
+                       groups=[groupuser])
         users.append(user)
     return users
 
@@ -35,7 +35,7 @@ class Database:
     accounts: list[Account] = list()
     groups: list[Group] = list()
 
-    def __init__(self):
+    def gen_users(self):
         self.accounts = gen_users()
 
     def get_accounts(self):
@@ -44,9 +44,15 @@ class Database:
     def add_account(self, account):
         self.accounts.append(account)
 
+    def add_group(self, group):
+        self.groups.append(group)
+
     def output(self):
         for account in self.get_accounts():
-            print(account.username, account.password)
+            print(account.username, account.password, end=' ')
+            for group in account.groups:
+                print(group.name, end=' ')
+            print()
 
 
 class AuthentificationError(Exception):
@@ -60,18 +66,29 @@ class AuthorizationError(Exception):
 class CLIUserInput:
     login: str
     password: str
-    resource: str
+    resource_request: str
+
 
     def begin_user_interaction(self, login, password):
         self.login = input("Введите логин")
         self.password = input("Введите пароль")
         #  self.resource = input("Введите ресурс к которому хотет доступ")
 
+    def user_interaction(self, account, resource_request):
+        self.resource_request =input("Чё надо, падла:")
+        authorize.access_check(account, resource_request)
+
 
 class CLIUserStub(CLIUserInput):
+
     def begin_user_interaction(self, login='l', password='p'):
         self.login = login
         self.password = password
+        # a.login_check(testuser) !!! почему "а" не работает из метода, а "audit" работает???
+
+    def user_interaction(self, account, resource_request='r'):
+        self.resource_request = resource_request
+        authorize.access_check(account, resource_request)
 
 
 class Authentication:
@@ -85,24 +102,32 @@ class Authentication:
 
     def login_check(self, account):
         if self.us_username == account.username:
-            self.password_check(account)
-            audit.add_incident(Incident(account, datetime.datetime.now(), status=True,
-                                        action="login"))  # создаётся объект инцидент в аудите. правильный ввод логина... наверое... пофигу!
-        else:
-            print("Неправильный логин или пароль")
+            audit.add_incident(Incident(account, datetime.datetime.now(), status=True, action="login"))
+            if self.us_password == account.password:
+                print("Аутентификация прошла успешно")
+                audit.add_incident(Incident(account, datetime.datetime.now(), status=True, action="password"))
 
-    def password_check(self, account):
-
-        if self.us_password == account.password:
-            print("Аутентификация прошла успешно")
+            else:
+                print("Неправильный логин или пароль")
+                audit.add_incident(Incident(account, datetime.datetime.now(), status=False, action="password"))
         else:
+            #  self.password_check(account)
+            audit.add_incident(Incident(account, datetime.datetime.now(), status=False, action="login"))
             print("Неправильный логин или пароль")
 
 
 class Authorization:
 
-    def access_check(self):
-        pass  # if Anton == Chertila_ebannaya
+    def access_check(self, account, resource_request):
+        for group in account.groups:
+            if resource_request in group.rights:
+                print("Доступ разрешён!")
+            else:  # в каких-то хоть группах
+                for db_group in db.groups:
+                    if resource_request in db_group.rights:
+                        print("У вас нет прав - вы женщина")
+                    else:
+                        print("Нет такого действия")
 
 
 class Incident:
@@ -123,52 +148,44 @@ class Audit:
 
     def get_incidents(self):
         for incident in self.incidents:
-            print(f'{incident.time} | user {incident.user_account.username} | ')
+            if incident.status:
+                print(f'<------------------> {incident.time} | user: \'{incident.user_account.username}\' | action: '
+                      f'{incident.action} | ip: 127.0.0.1 <----------------->')
+            else:
+                print(f'<####-ERROR-#######> {incident.time} | user: \'{incident.user_account.username}\' | action: '
+                      f'{incident.action} | ip: 127.0.0.1 <#################>')
 
     def add_incident(self, incident):
         self.incidents.append(incident)
 
-    # я, нет блин я попытался добавить сюда метод resource_check, чтобы также проверять как логин и пароль, но что-то пошло не так
 
-    # try: interface.login
-    # except AuthentificationError:
-    # print('ERROR #1')
-
-    #         try:
-    #             self.login_check(db)
-    #         except AuthentificationError:
-    #              print('ERROR #1')
-
-    def proverka(self, db):
-        for account in db.accounts:
-            print(account.username)
-
-
-audit = Audit()
 ###################################################################
-# interface = CLIUserStub()
-groupadmin = Group(name='groupadmin', rights=['p', 's'])
+audit = Audit()
+###
 db = Database()
+###
+groupadmin = Group(name='groupadmin', rights=['kill', 'word'])
+groupuser = Group(name='users', rights=['google', 'ya.oru'])
+db.add_group(groupadmin)
+db.add_group(groupuser)
+###
+db.gen_users()
+###
 interfaceU = CLIUserInput()
 interfaceM = CLIUserStub()
-
-testuser = Account('l', 'p', 'r')
+###
+testuser = Account('l', 'p', groups=[groupadmin, groupuser])
 db.add_account(testuser)
-
-# interface.begin_user_interaction()
-# interfaceU.begin_user_interaction()
-# a = Authentication(interface=interfaceU)
+someuser = Account('lol', 'p', groups=[])
+db.add_account(someuser)
+###
 interfaceM.begin_user_interaction('l', 'p')
 a = Authentication(interfaceM)
 a.login_check(testuser)
+###
+authorize = Authorization()
 
-# user1 = Account(username='user1', password='user', groups=[groupadmin])
-# db = Database()
-# db.get_accounts()
-# db.add_account(user1)
-# for u in db.accounts:
-#   print(u.username)
-#  print(u.password)
-
-
+###
 audit.get_incidents()
+
+#  db.output()
