@@ -66,16 +66,15 @@ class AuthorizationError(Exception):
 class CLIUserInput:
     login: str
     password: str
-    resource_request: str
+    resource_request: str = None
 
-
-    def begin_user_interaction(self, login, password):
-        self.login = input("Введите логин")
-        self.password = input("Введите пароль")
-        #  self.resource = input("Введите ресурс к которому хотет доступ")
+    def begin_user_interaction(self, login=input("Введите логин"), password=input("Введите пароль")):
+        print('ok')
+    #  self.password = input("Введите пароль")
+    #  self.resource = input("Введите ресурс к которому хотет доступ")
 
     def user_interaction(self, account, resource_request):
-        self.resource_request =input("Чё надо, падла:")
+        self.resource_request = input("Чё надо, падла:")
         authorize.access_check(account, resource_request)
 
 
@@ -86,7 +85,9 @@ class CLIUserStub(CLIUserInput):
         self.password = password
         # a.login_check(testuser) !!! почему "а" не работает из метода, а "audit" работает???
 
-    def user_interaction(self, account, resource_request='r'):
+    def user_interaction(self, account, resource_request):
+        if resource_request is None:
+            resource_request = input("Чё надо, падла:")
         self.resource_request = resource_request
         authorize.access_check(account, resource_request)
 
@@ -100,19 +101,21 @@ class Authentication:
         self.us_username = interface.login
         self.us_password = interface.password
 
-    def login_check(self, account):
-        if self.us_username == account.username:
-            audit.add_incident(Incident(account, datetime.datetime.now(), status=True, action="login"))
-            if self.us_password == account.password:
-                print("Аутентификация прошла успешно")
-                audit.add_incident(Incident(account, datetime.datetime.now(), status=True, action="password"))
-
+    def login_check(self, database):
+        for account in database.accounts:
+            if self.us_username == account.username:
+                audit.add_incident(Incident(account, datetime.datetime.now(), status=True, action="login"))
+                if self.us_password == account.password:
+                    print("Аутентификация прошла успешно")
+                    audit.add_incident(Incident(account, datetime.datetime.now(), status=True, action="password"))
+                    ####   interfaceM.user_interaction(account, None)
+                    break
+                else:
+                    # print("Неправильный логин или пароль")
+                    audit.add_incident(Incident(account, datetime.datetime.now(), status=False, action="password"))
             else:
-                print("Неправильный логин или пароль")
-                audit.add_incident(Incident(account, datetime.datetime.now(), status=False, action="password"))
-        else:
-            #  self.password_check(account)
-            audit.add_incident(Incident(account, datetime.datetime.now(), status=False, action="login"))
+                #  self.password_check(account)
+                audit.add_incident(Incident(account, datetime.datetime.now(), status=False, action="login"))
             print("Неправильный логин или пароль")
 
 
@@ -126,8 +129,7 @@ class Authorization:
                 for db_group in db.groups:
                     if resource_request in db_group.rights:
                         print("У вас нет прав - вы женщина")
-                    else:
-                        print("Нет такого действия")
+            print("Нет такого действия")
 
 
 class Incident:
@@ -164,11 +166,14 @@ audit = Audit()
 ###
 db = Database()
 ###
+authorize = Authorization()
+###
+
+
 groupadmin = Group(name='groupadmin', rights=['kill', 'word'])
 groupuser = Group(name='users', rights=['google', 'ya.oru'])
 db.add_group(groupadmin)
 db.add_group(groupuser)
-###
 db.gen_users()
 ###
 interfaceU = CLIUserInput()
@@ -179,11 +184,17 @@ db.add_account(testuser)
 someuser = Account('lol', 'p', groups=[])
 db.add_account(someuser)
 ###
-interfaceM.begin_user_interaction('l', 'p')
+# interfaceM.begin_user_interaction('l', 'p')
+
+db.output()
+#interfaceU.begin_user_interaction()
+#a = Authentication(interfaceU)
+#a.login_check(db)
 a = Authentication(interfaceM)
-a.login_check(testuser)
+a.login_check(db)
+
 ###
-authorize = Authorization()
+
 
 ###
 audit.get_incidents()
