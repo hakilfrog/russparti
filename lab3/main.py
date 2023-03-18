@@ -22,6 +22,15 @@ class Account:
         self.groups = groups
 
 
+class NoAccount:
+    login = ''
+    password = ''
+
+    def __init__(self, login, password):
+        self.login = login
+        self.password = password
+
+
 def gen_users():
     users = list()
     for user in range(20):
@@ -68,10 +77,12 @@ class CLIUserInput:
     password: str
     resource_request: str = None
 
-    def begin_user_interaction(self, login=input("Введите логин"), password=input("Введите пароль")):
-        print('ok')
-    #  self.password = input("Введите пароль")
-    #  self.resource = input("Введите ресурс к которому хотет доступ")
+    def begin_user_interaction(self, login, password):  # login=input("Введите логин"), password=input("Введите пароль")
+        noaccount = NoAccount(login=input('Введите логин'), password=input('Введите пароль'))
+        return noaccount
+        # self.login = input("Введите логин")
+        # self.password = input("Введите пароль")
+        # self.resource = input("Введите ресурс к которому хотет доступ")
 
     def user_interaction(self, account, resource_request):
         self.resource_request = input("Чё надо, падла:")
@@ -81,9 +92,11 @@ class CLIUserInput:
 class CLIUserStub(CLIUserInput):
 
     def begin_user_interaction(self, login='l', password='p'):
-        self.login = login
-        self.password = password
-        # a.login_check(testuser) !!! почему "а" не работает из метода, а "audit" работает???
+        noaccaunt = NoAccount(login, password)
+        return noaccaunt
+        # self.login = login
+        # self.password = password
+        # a.credentials_check(testuser) !!! почему "а" не работает из метода, а "audit" работает???
 
     def user_interaction(self, account, resource_request):
         if resource_request is None:
@@ -93,30 +106,56 @@ class CLIUserStub(CLIUserInput):
 
 
 class Authentication:
-    account: Account
+    noaccount: NoAccount
     us_username: str
     us_password: str
+    statusl = True
+    statusp = True
 
-    def __init__(self, interface):
-        self.us_username = interface.login
-        self.us_password = interface.password
+    def __init__(self, noaccount):
+        self.noaccount = noaccount
 
-    def login_check(self, database):
-        for account in database.accounts:
-            if self.us_username == account.username:
-                audit.add_incident(Incident(account, datetime.datetime.now(), status=True, action="login"))
-                if self.us_password == account.password:
-                    print("Аутентификация прошла успешно")
-                    audit.add_incident(Incident(account, datetime.datetime.now(), status=True, action="password"))
-                    ####   interfaceM.user_interaction(account, None)
-                    break
+    def credentials_check(self, database):
+        try:
+            for account in database.accounts:
+                if self.noaccount.login == account.username:
+                    self.statusl = True
+
+                    if self.noaccount.password == account.password:
+                        self.statusp = True
+                        print("--> Аутентификация прошла успешно <--")
+                        break
+
+                    else:
+                        self.statusp = False
+                        break
+
                 else:
-                    # print("Неправильный логин или пароль")
-                    audit.add_incident(Incident(account, datetime.datetime.now(), status=False, action="password"))
+                    self.statusl = False
+
+            if not self.statusl:
+                audit.add_incident(
+                    Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusl, action="login"))
+                raise AuthentificationError("!--> Неправильный логин или пароль <--!")
+            elif not self.statusp:
+                if self.statusl:
+                    audit.add_incident(
+                        Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusl, action="login"))
+                    audit.add_incident(
+                        Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="password"))
+
+                    raise AuthentificationError("!--> Неправильный логин или пароль <--!")
+            elif self.statusl:
+                audit.add_incident(
+                    Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="login"))
+                audit.add_incident(
+                    Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="password"))
             else:
-                #  self.password_check(account)
-                audit.add_incident(Incident(account, datetime.datetime.now(), status=False, action="login"))
-            print("Неправильный логин или пароль")
+                audit.add_incident(
+                    Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="password"))
+
+        except AuthentificationError:
+            print("!--> Неправильный логин или пароль <--!")
 
 
 class Authorization:
@@ -133,13 +172,13 @@ class Authorization:
 
 
 class Incident:
-    user_account: Account
+    username: Account
     time: datetime
     status: bool
     action: str
 
     def __init__(self, user_name, time, status, action):
-        self.user_account = user_name
+        self.username = user_name
         self.time = time
         self.status = status
         self.action = action
@@ -151,10 +190,10 @@ class Audit:
     def get_incidents(self):
         for incident in self.incidents:
             if incident.status:
-                print(f'<------------------> {incident.time} | user: \'{incident.user_account.username}\' | action: '
+                print(f'<------------------> {incident.time} | user: \'{incident.username}\' | action: '
                       f'{incident.action} | ip: 127.0.0.1 <----------------->')
             else:
-                print(f'<####-ERROR-#######> {incident.time} | user: \'{incident.user_account.username}\' | action: '
+                print(f'<####-ERROR-#######> {incident.time} | user: \'{incident.username}\' | action: '
                       f'{incident.action} | ip: 127.0.0.1 <#################>')
 
     def add_incident(self, incident):
@@ -174,6 +213,7 @@ groupadmin = Group(name='groupadmin', rights=['kill', 'word'])
 groupuser = Group(name='users', rights=['google', 'ya.oru'])
 db.add_group(groupadmin)
 db.add_group(groupuser)
+###
 db.gen_users()
 ###
 interfaceU = CLIUserInput()
@@ -184,19 +224,14 @@ db.add_account(testuser)
 someuser = Account('lol', 'p', groups=[])
 db.add_account(someuser)
 ###
-# interfaceM.begin_user_interaction('l', 'p')
+#  interfaceM.begin_user_interaction('lo', 'p')
 
 db.output()
-#interfaceU.begin_user_interaction()
-#a = Authentication(interfaceU)
-#a.login_check(db)
-a = Authentication(interfaceM)
-a.login_check(db)
-
-###
-
-
+# interfaceU.begin_user_interaction()
+# a = Authentication(interfaceU)
+# a.credentials_check(db)
+a = Authentication(interfaceM.begin_user_interaction('l', 'p'))  # <- введите данные для авторизации
+a.credentials_check(db)
 ###
 audit.get_incidents()
 
-#  db.output()
