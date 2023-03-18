@@ -23,10 +23,14 @@ class Account:
 
 
 class NoAccount:
-    login = ''
-    password = ''
+    login: str
+    password: str
 
-    def __init__(self, login, password):
+    def init(self, login, password):
+        self.login = login
+        self.password = password
+
+    def cli_itin(self, login=input('Введите логин'), password=input('Введите пароль')):
         self.login = login
         self.password = password
 
@@ -77,8 +81,9 @@ class CLIUserInput:
     password: str
     resource_request: str = None
 
-    def begin_user_interaction(self, login, password):  # login=input("Введите логин"), password=input("Введите пароль")
-        noaccount = NoAccount(login=input('Введите логин'), password=input('Введите пароль'))
+    def begin_user_interaction(self, noaccount):  # login=input("Введите логин"), password=input("Введите пароль")
+        noaccount = NoAccount()
+        noaccount.cli_itin()
         return noaccount
         # self.login = input("Введите логин")
         # self.password = input("Введите пароль")
@@ -92,7 +97,9 @@ class CLIUserInput:
 class CLIUserStub(CLIUserInput):
 
     def begin_user_interaction(self, login='l', password='p'):
-        noaccaunt = NoAccount(login, password)
+        noaccaunt = NoAccount()
+        noaccaunt.init(login, password)
+
         return noaccaunt
         # self.login = login
         # self.password = password
@@ -207,10 +214,13 @@ db = Database()
 ###
 authorize = Authorization()
 ###
+noaccount = NoAccount()
+###
 
-
-groupadmin = Group(name='groupadmin', rights=['kill', 'word'])
-groupuser = Group(name='users', rights=['google', 'ya.oru'])
+groupadmin = Group(name='groupadmin',
+                   rights=['kill', 'word'])
+groupuser = Group(name='users',
+                  rights=['google', 'ya.oru'])
 db.add_group(groupadmin)
 db.add_group(groupuser)
 ###
@@ -219,7 +229,9 @@ db.gen_users()
 interfaceU = CLIUserInput()
 interfaceM = CLIUserStub()
 ###
-testuser = Account('l', 'p', groups=[groupadmin, groupuser])
+testuser = Account(username='l',
+                   password='p',
+                   groups=[groupadmin, groupuser])
 db.add_account(testuser)
 someuser = Account('lol', 'p', groups=[])
 db.add_account(someuser)
@@ -227,10 +239,9 @@ db.add_account(someuser)
 #  interfaceM.begin_user_interaction('lo', 'p')
 
 db.output()
-# interfaceU.begin_user_interaction()
-# a = Authentication(interfaceU)
-# a.credentials_check(db)
-a = Authentication(interfaceM.begin_user_interaction('l', 'p'))  # <- введите данные для авторизации
+a = Authentication(interfaceU.begin_user_interaction(noaccount=noaccount))
+a.credentials_check(db)
+a = Authentication(interfaceM.begin_user_interaction(login='l', password='p'))  # <- введите данные для авторизации
 a.credentials_check(db)
 ###
 audit.get_incidents()
