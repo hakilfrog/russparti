@@ -23,16 +23,22 @@ class Account:
 
 
 class NoAccount:
-    login: str
-    password: str
+    login: str = ''
+    password: str = ''
+    int: int
+    request: str
 
-    def init(self, login, password):
+    def init(self, login, password, request):
         self.login = login
         self.password = password
+        self.request = request
+        self.int = 0
 
-    def cli_itin(self, login=input('Введите логин'), password=input('Введите пароль')):
-        self.login = login
-        self.password = password
+    def cli_itin(self):
+        self.login = input('Введите логин')
+        self.password = input('Введите пароль')
+        self.int = 1
+
 
 
 def gen_users():
@@ -81,35 +87,28 @@ class CLIUserInput:
     password: str
     resource_request: str = None
 
-    def begin_user_interaction(self, noaccount):  # login=input("Введите логин"), password=input("Введите пароль")
-        noaccount = NoAccount()
-        noaccount.cli_itin()
-        return noaccount
-        # self.login = input("Введите логин")
-        # self.password = input("Введите пароль")
-        # self.resource = input("Введите ресурс к которому хотет доступ")
+    def begin_user_interaction(self, some_noaccount):
+        some_noaccount = NoAccount()
+        some_noaccount.cli_itin()
+        return some_noaccount
 
     def user_interaction(self, account, resource_request):
         self.resource_request = input("Чё надо, падла:")
-        authorize.access_check(account, resource_request)
+        return resource_request
 
 
 class CLIUserStub(CLIUserInput):
 
-    def begin_user_interaction(self, login='l', password='p'):
-        noaccaunt = NoAccount()
-        noaccaunt.init(login, password)
+    def begin_user_interaction(self, login='l', password='p', request='kill'):
+        some_noaccaunt = NoAccount()
+        some_noaccaunt.init(login, password, request)
+        return some_noaccaunt
 
-        return noaccaunt
-        # self.login = login
-        # self.password = password
-        # a.credentials_check(testuser) !!! почему "а" не работает из метода, а "audit" работает???
-
-    def user_interaction(self, account, resource_request):
+    def user_interaction(self, account, resource_request=None):
         if resource_request is None:
             resource_request = input("Чё надо, падла:")
         self.resource_request = resource_request
-        authorize.access_check(account, resource_request)
+        return account, resource_request
 
 
 class Authentication:
@@ -131,6 +130,16 @@ class Authentication:
                     if self.noaccount.password == account.password:
                         self.statusp = True
                         print("--> Аутентификация прошла успешно <--")
+                        audit.add_incident(
+                            Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp,
+                                     action="login"))
+                        audit.add_incident(
+                            Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp,
+                                     action="password"))
+                        if self.noaccount.int == 0:
+                            authorize.access_check(account, self.noaccount.request)
+                        else:
+                            authorize.access_check(account, interfaceM.user_interaction(account))
                         break
 
                     else:
@@ -150,32 +159,47 @@ class Authentication:
                         Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusl, action="login"))
                     audit.add_incident(
                         Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="password"))
-
                     raise AuthentificationError("!--> Неправильный логин или пароль <--!")
             elif self.statusl:
-                audit.add_incident(
-                    Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="login"))
-                audit.add_incident(
-                    Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="password"))
+                pass
             else:
                 audit.add_incident(
                     Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="password"))
 
         except AuthentificationError:
             print("!--> Неправильный логин или пароль <--!")
+            # counter = 0
+            # while counter < 3:
+            #     print("Попробуйте ещё раз:")
+            #     a.credentials_check(db)
+
+
 
 
 class Authorization:
+    status = 2
 
     def access_check(self, account, resource_request):
         for group in account.groups:
             if resource_request in group.rights:
+                self.status = 0
                 print("Доступ разрешён!")
+                audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
+                                            status='True', action=f"Authorized to {resource_request}"))
+                break
             else:  # в каких-то хоть группах
                 for db_group in db.groups:
                     if resource_request in db_group.rights:
-                        print("У вас нет прав - вы женщина")
+                        self.status = 1
+                        break
+        if self.status == 1:
+            print("Нет прав для выполнения")
+            audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
+                                        status=False, action=f"Authorized to {resource_request}"))
+        elif self.status == 2:
             print("Нет такого действия")
+        audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
+                                        status=False, action=f"Authorized to {resource_request}"))
 
 
 class Incident:
@@ -207,16 +231,15 @@ class Audit:
         self.incidents.append(incident)
 
 
-###################################################################
+########################################################################################################################
 audit = Audit()
 ###
 db = Database()
 ###
 authorize = Authorization()
 ###
-noaccount = NoAccount()
+noaccountmain = NoAccount()
 ###
-
 groupadmin = Group(name='groupadmin',
                    rights=['kill', 'word'])
 groupuser = Group(name='users',
@@ -224,24 +247,23 @@ groupuser = Group(name='users',
 db.add_group(groupadmin)
 db.add_group(groupuser)
 ###
-db.gen_users()
-###
-interfaceU = CLIUserInput()
-interfaceM = CLIUserStub()
+#db.gen_users()
 ###
 testuser = Account(username='l',
                    password='p',
                    groups=[groupadmin, groupuser])
+someuser = Account(username='lol', password='p', groups=[groupuser])
 db.add_account(testuser)
-someuser = Account('lol', 'p', groups=[])
 db.add_account(someuser)
 ###
-#  interfaceM.begin_user_interaction('lo', 'p')
-
 db.output()
-a = Authentication(interfaceU.begin_user_interaction(noaccount=noaccount))
-a.credentials_check(db)
-a = Authentication(interfaceM.begin_user_interaction(login='l', password='p'))  # <- введите данные для авторизации
+###
+#interfaceU = CLIUserInput()
+interfaceM = CLIUserStub()
+###
+# a = Authentication(interfaceU.begin_user_interaction(some_noaccount=noaccountmain))
+# a.credentials_check(db)
+a = Authentication(interfaceM.begin_user_interaction(login='lol', password='p', request='kill'))  # <- введите данные для авторизации
 a.credentials_check(db)
 ###
 audit.get_incidents()
