@@ -173,26 +173,31 @@ class Authorization:
     status = 2
 
     def access_check(self, account, resource_request):
-        for group in account.groups:
-            if resource_request in group.rights:
-                self.status = 0
-                print("Доступ разрешён!")
+        if len(account.groups) > 0:
+            for group in account.groups:
+                if resource_request in group.rights:
+                    self.status = 0
+                    print("Доступ разрешён!")
+                    audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
+                                                status='True', action=f"Authorized to {resource_request}"))
+                    break
+                else:  # в каких-то хоть группах
+                    for db_group in db.groups:
+                        if resource_request in db_group.rights:
+                            self.status = 1
+                            break
+            if self.status == 1:
+                print("Нет прав для выполнения")
                 audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
-                                            status='True', action=f"Authorized to {resource_request}"))
-                break
-            else:  # в каких-то хоть группах
-                for db_group in db.groups:
-                    if resource_request in db_group.rights:
-                        self.status = 1
-                        break
-        if self.status == 1:
+                                            status=False, action=f"Authorized to {resource_request}"))
+            elif self.status == 2:
+                print("Нет такого действия")
+                audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
+                                            status=False, action=f"Authorized to {resource_request}"))
+        else:
             print("Нет прав для выполнения")
             audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
                                         status=False, action=f"Authorized to {resource_request}"))
-        elif self.status == 2:
-            print("Нет такого действия")
-            audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
-                                    status=False, action=f"Authorized to {resource_request}"))
 
 
 class Incident:
@@ -245,7 +250,7 @@ db.add_group(groupuser)
 testuser = Account(username='l',
                    password='p',
                    groups=[groupadmin, groupuser])
-someuser = Account(username='lol', password='p', groups=[])#groupuser])
+someuser = Account(username='lol', password='p', groups=[])  # groupuser])
 db.add_account(testuser)
 db.add_account(someuser)
 ###
