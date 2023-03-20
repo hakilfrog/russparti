@@ -32,13 +32,12 @@ class NoAccount:
         self.login = login
         self.password = password
         self.request = request
-        self.int = 0
+        self.int = 0  # интерфейс пользователя (1 - CLI, 0 - просто)
 
     def cli_itin(self):
         self.login = input('Введите логин')
         self.password = input('Введите пароль')
         self.int = 1
-
 
 
 def gen_users():
@@ -161,19 +160,13 @@ class Authentication:
                         Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="password"))
                     raise AuthentificationError("!--> Неправильный логин или пароль <--!")
             elif self.statusl:
-                pass
+                pass  # так надо не спрашивай
             else:
                 audit.add_incident(
                     Incident(self.noaccount.login, datetime.datetime.now(), status=self.statusp, action="password"))
 
         except AuthentificationError:
             print("!--> Неправильный логин или пароль <--!")
-            # counter = 0
-            # while counter < 3:
-            #     print("Попробуйте ещё раз:")
-            #     a.credentials_check(db)
-
-
 
 
 class Authorization:
@@ -198,8 +191,8 @@ class Authorization:
                                         status=False, action=f"Authorized to {resource_request}"))
         elif self.status == 2:
             print("Нет такого действия")
-        audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
-                                        status=False, action=f"Authorized to {resource_request}"))
+            audit.add_incident(Incident(user_name=account.username, time=datetime.datetime.now(),
+                                    status=False, action=f"Authorized to {resource_request}"))
 
 
 class Incident:
@@ -247,24 +240,24 @@ groupuser = Group(name='users',
 db.add_group(groupadmin)
 db.add_group(groupuser)
 ###
-#db.gen_users()
+# db.gen_users()
 ###
 testuser = Account(username='l',
                    password='p',
                    groups=[groupadmin, groupuser])
-someuser = Account(username='lol', password='p', groups=[groupuser])
+someuser = Account(username='lol', password='p', groups=[])#groupuser])
 db.add_account(testuser)
 db.add_account(someuser)
 ###
 db.output()
 ###
-#interfaceU = CLIUserInput()
+# interfaceU = CLIUserInput()
 interfaceM = CLIUserStub()
 ###
 # a = Authentication(interfaceU.begin_user_interaction(some_noaccount=noaccountmain))
 # a.credentials_check(db)
-a = Authentication(interfaceM.begin_user_interaction(login='lol', password='p', request='kill'))  # <- введите данные для авторизации
+a = Authentication(
+    interfaceM.begin_user_interaction(login='lol', password='p', request='ya.oru'))  # <- введите данные для авторизации
 a.credentials_check(db)
 ###
 audit.get_incidents()
-
