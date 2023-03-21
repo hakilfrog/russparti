@@ -19,7 +19,7 @@ class ElevatorState:
 
 class EmptyState(ElevatorState):
     def enter(self, weight):
-        self.elevator.current_weight += weight
+        self.elevator.current_weight = weight
         self.elevator.state = OccupiedState(self.elevator)
 
     def exit(self, ):
@@ -64,6 +64,9 @@ class OccupiedState(ElevatorState):
             print("Ниже некуда")
         else:
             self.elevator.current_floor -= 1
+
+    def get_state(self):
+        return "Занято"
 
 
 class Elevator:
