@@ -56,7 +56,7 @@ class OccupiedState(ElevatorState):
     def go_up(self):
         if self.elevator.current_floor == self.elevator.max_floor:
             print("Выше некуда")
-        else:
+        elif self.enter(elevator.current_weight):
             self.elevator.current_floor += 1
 
     def go_down(self):
@@ -89,7 +89,7 @@ class Elevator:
 
     def go_up(self):
         self.state.go_up()
-        print("Текуций этаж:", elevator.current_floor)
+        print("Текущий этаж:", elevator.current_floor)
 
     def go_down(self):
         self.state.go_down()
