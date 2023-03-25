@@ -1,3 +1,4 @@
+import time
 class ElevatorState:
     def __init__(self, elevator):
         self.elevator = elevator
@@ -35,6 +36,7 @@ class EmptyState(ElevatorState):
         return 'Ожидание...'
 
 
+
 class OccupiedState(ElevatorState):
     def enter(self, weight):
         if self.elevator.current_weight + weight > self.elevator.max_weight:
@@ -66,11 +68,21 @@ class OccupiedState(ElevatorState):
             self.elevator.current_floor -= 1
 
     def get_state(self):
-        return "Занято"
+        return "В пути с пассажиром"
+
+
+floors = ['p', '1', '2', '3']
+
+
+
+class IncomingState(ElevatorState):
+
+    def get_state(self):
+        return "На пути к пассажиру"
 
 
 class Elevator:
-    def __init__(self, min_weight, max_weight, min_floor=0, max_floor=3):
+    def __init__(self, min_weight, max_weight, min_floor=0, max_floor=3):  # сука лист ['p', '1', '2', '3']
         self.max_weight = max_weight
         self.min_weight = min_weight
         self.min_floor = min_floor
@@ -89,10 +101,12 @@ class Elevator:
 
     def go_up(self):
         self.state.go_up()
+        time.sleep(0.5)
         print("Текущий этаж:", elevator.current_floor)
 
     def go_down(self):
         self.state.go_down()
+        time.sleep(0.5)
         print("Текущий этаж:", elevator.current_floor)
 
     def get_state(self):
@@ -105,7 +119,7 @@ elevator = Elevator(min_weight=10, max_weight=500)
 
 #####################################################
 print(elevator.get_state())
-elevator.enter(0)  # вход тела
+elevator.enter(20)  # вход тела
 # print("Текущий вес:", elevator.current_weight) # выводим вес
 # print("Current state:",
 #       type(elevator.state).__name__)  # почему выводится блять OccupiedState и че с ним делать (наполнение) ????
@@ -122,7 +136,7 @@ elevator.go_up()
 
 
 elevator.go_up()
-# print("Текущий этаж:", elevator.current_floor)  # а выше не получается да?
+# print("Текущий этаж:", elevator.current_floor) # а выше не получается да?
 print(elevator.get_state())
 
 elevator.go_down()
