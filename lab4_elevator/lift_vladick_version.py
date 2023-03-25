@@ -33,23 +33,23 @@ class ElevatorState:
 class EmptyState(ElevatorState):
 
     def enter(self, weight):
-        #try:
-            self.elevator.current_weight = weight
-            if self.elevator.current_weight > self.elevator.max_weight:
-                raise MaxErrorWeight
-            elif self.elevator.current_weight  < self.elevator.min_weight:
-                print("Лифт пуст")
-                self.elevator.state = EmptyState(self.elevator)
-                raise MinErrorWeight
-            else:
-                self.elevator.state = OccupiedState(self.elevator)
+        # try:
+        self.elevator.current_weight = weight
+        if self.elevator.current_weight > self.elevator.max_weight:
+            raise MaxErrorWeight
+        elif self.elevator.current_weight < self.elevator.min_weight:
+            print("Лифт пуст")
+            self.elevator.state = EmptyState(self.elevator)
+            raise MinErrorWeight
+        else:
+            self.elevator.state = OccupiedState(self.elevator)
 
-        # except MaxErrorWeight:
-        #     print("Перевес! Попробуйте ещё раз")
-        #
-        #
-        # except MinErrorWeight:
-        #     print("Недостаточный вес!")
+    # except MaxErrorWeight:
+    #     print("Перевес! Попробуйте ещё раз")
+    #
+    #
+    # except MinErrorWeight:
+    #     print("Недостаточный вес!")
 
     def exit(self, weight):
         if self.elevator.current_weight - weight < 0:
@@ -59,7 +59,8 @@ class EmptyState(ElevatorState):
         print("Лифт пуст")
 
     def go_up(self):
-        self.elevator.state = EmptyState(self.elevator)  # print("Лифт на самом высоком этаже")  # нахуя в эмти стайт это?
+        self.elevator.state = EmptyState(
+            self.elevator)  # print("Лифт на самом высоком этаже")  # нахуя в эмти стайт это?
 
     def go_down(self):
         self.elevator.state = EmptyState(self.elevator)
@@ -67,6 +68,11 @@ class EmptyState(ElevatorState):
 
     def get_state(self):
         return 'Ожидание...'
+
+    def go_to_p(self, floor):
+        if self.elevator.current_weight == 0:
+            self.elevator.state = IncomingState(self.elevator)
+            elevator.go_to_p(floor)
 
 
 class OccupiedState(ElevatorState):
@@ -79,7 +85,7 @@ class OccupiedState(ElevatorState):
         #     self.elevator.state = EmptyState(self.elevator)
         #     raise ErrorWeight
 
-            # return False
+        # return False
 
         # elif self.elevator.current_weight + weight < self.elevator.min_weight:
         #     print("Лифт пуст")
@@ -117,15 +123,18 @@ class OccupiedState(ElevatorState):
 class IncomingState(ElevatorState):
 
     def go_to_p(self, floor):
-        if elevator.min_floor < floor < elevator.max_floor:
+        if elevator.min_floor <= floor <= elevator.max_floor:
             if self.elevator.current_floor == floor:
+                print(elevator.get_state())
                 self.elevator.state = EmptyState(self.elevator)
+
             else:
                 time.sleep(0.5)
                 self.elevator.current_floor = floor
+                print(elevator.get_state())
+                self.elevator.state = EmptyState(self.elevator)
         else:
             raise ValueError
-
 
     def get_state(self):
         return "На пути к пассажиру"
@@ -159,6 +168,11 @@ class Elevator:
         time.sleep(0.5)
         print("Текущий этаж:", elevator.current_floor)
 
+    def go_to_p(self, floor):
+        self.state.go_to_p(floor)
+        time.sleep(0.5)
+        print("Текущий этаж:", elevator.current_floor)
+
     def get_state(self):
         return self.state.get_state()
 
@@ -169,29 +183,24 @@ elevator = Elevator(min_weight=10, max_weight=500)
 
 #####################################################
 print(elevator.get_state())
+elevator.go_to_p(1)
+#print(elevator.get_state())  # мы не можем перехватить поездку к пассажиру тк мы сразу меняем состояние на ожидание 🤷‍♂️
 elevator.enter(420)  # вход тела
-# print("Текущий вес:", elevator.current_weight) # выводим вес
-# print("Current state:",
-#       type(elevator.state).__name__)  # почему выводится блять OccupiedState и че с ним делать (наполнение) ????
-print(elevator.get_state())
-
-elevator.go_up(1)
-# print("Текущий этаж:", elevator.current_floor)  # 1 этаж
 print(elevator.get_state())
 elevator.go_up(2)
-# print("Текущий этаж:", elevator.current_floor)  # 2 этаж
-
+print(elevator.get_state())
 elevator.go_up(3)
-# print("Текущий этаж:", elevator.current_floor)  # 3 этаж
-
-
 elevator.go_up(5)
-# print("Текущий этаж:", elevator.current_floor) # а выше не получается да?
+
 print(elevator.get_state())
 elevator.exit(420)
-
+print(elevator.get_state())
+elevator.go_to_p(2)
+#print(elevator.get_state())
 elevator.enter(40)
+print(elevator.get_state())
 elevator.go_down(1)
+print(elevator.get_state())
 # print("Текущий этаж:", elevator.current_floor)  # спускаемся вниз
 
 elevator.exit(40)
