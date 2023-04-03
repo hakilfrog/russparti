@@ -60,11 +60,11 @@ class EmptyState(ElevatorState):
 
     def go_up(self):
         self.elevator.state = EmptyState(
-            self.elevator)  # print("Лифт на самом высоком этаже")  # нахуя в эмти стайт это?
+            self.elevator)  # print("Лифт на самом высоком этаже")  # зачем в эмти стайт это?
 
     def go_down(self):
         self.elevator.state = EmptyState(self.elevator)
-        #  print("Лифт на самом нижнем этаже") # нахуя в эмти стайт это?
+        #  print("Лифт на самом нижнем этаже") # зачем в эмти стайт это?
 
     def get_state(self):
         return 'Ожидание...'
@@ -107,7 +107,7 @@ class OccupiedState(ElevatorState):
             else:
                 self.elevator.current_floor += floor - self.elevator.current_floor
         # elif self.enter(elevator.current_weight):
-        #     self.elevator.current_floor += 1 # ЭТО ЧТО ЗА ХУЙНЯ?
+        #     self.elevator.current_floor += 1 # ЭТО ЧТО ЗА ТАКОЕ?
 
     def go_down(self, floor):
         if self.elevator.min_weight <= self.elevator.current_weight <= self.elevator.max_weight:
@@ -141,7 +141,7 @@ class IncomingState(ElevatorState):
 
 
 class Elevator:
-    def __init__(self, min_weight, max_weight, min_floor=0, max_floor=3):  # сука лист ['p', '1', '2', '3']
+    def __init__(self, min_weight, max_weight, min_floor=0, max_floor=3):  # блин лист ['p', '1', '2', '3']
         self.max_weight = max_weight
         self.min_weight = min_weight
         self.min_floor = min_floor
